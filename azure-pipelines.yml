@@ -1,7 +1,9 @@
 trigger: none
-pool:raj-pool
+pool: raj-pool
+
 steps:
 - task: TerraformTask@5
+  displayName: 'Terraform Init'
   inputs:
     provider: 'azurerm'
     command: 'init'
@@ -11,3 +13,20 @@ steps:
     backendAzureRmStorageAccountName: 'rajkastorage1123'
     backendAzureRmContainerName: 'raj-dbba'
     backendAzureRmKey: 'dabba.tfstate'
+
+- task: TerraformTask@5
+  displayName: 'Terraform Plan'
+  inputs:
+    provider: 'azurerm'
+    command: 'plan'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/Module'
+    environmentServiceNameAzureRM: 'raj-service'
+
+- task: TerraformTask@5
+  displayName: 'Terraform Apply'
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/Module'
+    environmentServiceNameAzureRM: 'raj-service'
+    args: '-auto-approve'
