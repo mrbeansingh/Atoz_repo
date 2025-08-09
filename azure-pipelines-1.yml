@@ -1,6 +1,6 @@
 trigger: none
 
-pool: raj-pool
+pool: Pipeline
 
 variables:
   path: '$(System.DefaultWorkingDirectory)/Module'
