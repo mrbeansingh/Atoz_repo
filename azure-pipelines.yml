@@ -8,10 +8,15 @@ variables:
 
 
 
+
+
 steps:
 - task: TerraformInstaller@1
   inputs:
-    terraformVersion: 'latest'
+    terraformVersion: '1.12.2'
+  env:
+    PATH: 'C:\Windows\System32\WindowsPowerShell\v1.0\'
+
 - task: TerraformTask@5
   displayName: 'Terraform Init'
   inputs:
