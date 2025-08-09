@@ -7,6 +7,9 @@ variables:
   service-connection: 'raj-service'
 
 steps:
+- task: TerraformInstaller@1
+  inputs:
+    terraformVersion: 'latest'
 
 
 # Terraform Init
