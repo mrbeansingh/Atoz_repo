@@ -6,7 +6,13 @@ variables:
   path: '$(System.DefaultWorkingDirectory)/Module'
   service-connection: 'raj-service'
 
+
+
 steps:
+- task: TerraformInstaller@1
+  displayName: 'Terraform insall'
+  inputs:
+    terraformVersion: 'latest'
 - task: TerraformTask@5
   displayName: 'Terraform Init'
   inputs:
