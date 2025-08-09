@@ -6,17 +6,22 @@ variables:
   path: '$(System.DefaultWorkingDirectory)/Module'
   service-connection: 'raj-service'
 
-
-
-
-
 steps:
-- task: TerraformInstaller@1
-  inputs:
-    terraformVersion: '1.12.2'
-  env:
-    PATH: 'C:\Windows\System32\WindowsPowerShell\v1.0\;$(PATH)'
+# Manually install Terraform 1.12.2
+- powershell: |
+    $tfVersion = "1.12.2"
+    $tfUrl = "https://releases.hashicorp.com/terraform/$tfVersion/terraform_${tfVersion}_windows_amd64.zip"
+    $tfZip = "$env:TEMP\terraform.zip"
+    $tfExtract = "$env:USERPROFILE\terraform\$tfVersion"
 
+    Invoke-WebRequest -Uri $tfUrl -OutFile $tfZip
+    Expand-Archive -Path $tfZip -DestinationPath $tfExtract -Force
+
+    echo "##vso[task.prependpath]$tfExtract"
+    terraform --version
+  displayName: "Manually install Terraform 1.12.2"
+
+# Terraform Init
 - task: TerraformTask@5
   displayName: 'Terraform Init'
   inputs:
@@ -29,6 +34,7 @@ steps:
     backendAzureRmContainerName: 'raj-dbba'
     backendAzureRmKey: 'dabba.tfstate'
 
+# Terraform Plan
 - task: TerraformTask@5
   displayName: 'Terraform Plan'
   name: terraformPlan  
@@ -38,7 +44,7 @@ steps:
     workingDirectory: $(path)
     environmentServiceNameAzureRM: $(service-connection)
 
-
+# Optional manual approval
 # - task: ManualValidation@1
 #   displayName: '🛑 Manual Approval Before Apply'
 #   condition: succeeded('terraformPlan')
@@ -48,7 +54,7 @@ steps:
 #     notifyUsers: 'abhay.kumar.singh11sep@gmail.com'
 #     onTimeout: 'reject'
 
-
+# Terraform Apply
 - task: TerraformTask@5
   displayName: 'Terraform Apply'
   condition: succeeded()
