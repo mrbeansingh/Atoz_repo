@@ -2,14 +2,18 @@ trigger: none
 
 pool: raj-pool
 
+variables:
+  path: '$(System.DefaultWorkingDirectory)/Module'
+  service-connection: 'raj-service'
+
 steps:
 - task: TerraformTask@5
   displayName: 'Terraform Init'
   inputs:
     provider: 'azurerm'
     command: 'init'
-    workingDirectory: '$(System.DefaultWorkingDirectory)\Module'
-    backendServiceArm: 'raj-service'
+    workingDirectory: $(path)
+    backendServiceArm: '$(service-connection)'
     backendAzureRmResourceGroupName: 'raj-kumar-snatoshi'
     backendAzureRmStorageAccountName: 'rajkastorage1123'
     backendAzureRmContainerName: 'raj-dbba'
@@ -17,17 +21,30 @@ steps:
 
 - task: TerraformTask@5
   displayName: 'Terraform Plan'
+  name: terraformPlan  
   inputs:
     provider: 'azurerm'
     command: 'plan'
-    workingDirectory: '$(System.DefaultWorkingDirectory)\Module'
-    environmentServiceNameAzureRM: 'raj-service'
+    workingDirectory: $(path)
+    environmentServiceNameAzureRM: $(service-connection)
+
+
+# - task: ManualValidation@1
+#   displayName: '🛑 Manual Approval Before Apply'
+#   condition: succeeded('terraformPlan')
+#   timeoutInMinutes: 60
+#   inputs:
+#     instructions: 'Review Terraform plan and approve to continue.'
+#     notifyUsers: 'abhay.kumar.singh11sep@gmail.com'
+#     onTimeout: 'reject'
+
 
 - task: TerraformTask@5
   displayName: 'Terraform Apply'
+  condition: succeeded()
   inputs:
     provider: 'azurerm'
     command: 'apply'
-    workingDirectory: '$(System.DefaultWorkingDirectory)\Module'
-    environmentServiceNameAzureRM: 'raj-service'
+    workingDirectory: $(path)
+    environmentServiceNameAzureRM: $(service-connection)
     args: '-auto-approve'
