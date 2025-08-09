@@ -1,0 +1,13 @@
+trigger: none
+pool:raj-pool
+steps:
+- task: TerraformTask@5
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/Module'
+    backendServiceArm: 'raj-service'
+    backendAzureRmResourceGroupName: 'raj-kumar-snatoshi'
+    backendAzureRmStorageAccountName: 'rajkastorage1123'
+    backendAzureRmContainerName: 'raj-dbba'
+    backendAzureRmKey: 'dabba.tfstate'
