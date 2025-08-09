@@ -7,7 +7,7 @@ steps:
   inputs:
     provider: 'azurerm'
     command: 'init'
-    workingDirectory: '$(System.DefaultWorkingDirectory)/Module'
+    workingDirectory: '$(System.DefaultWorkingDirectory)\Module'
     backendServiceArm: 'raj-service'
     backendAzureRmResourceGroupName: 'raj-kumar-snatoshi'
     backendAzureRmStorageAccountName: 'rajkastorage1123'
@@ -19,7 +19,7 @@ steps:
   inputs:
     provider: 'azurerm'
     command: 'plan'
-    workingDirectory: '$(System.DefaultWorkingDirectory)/Module'
+    workingDirectory: '$(System.DefaultWorkingDirectory)\Module'
     environmentServiceNameAzureRM: 'raj-service'
 
 - task: TerraformTask@5
@@ -27,6 +27,6 @@ steps:
   inputs:
     provider: 'azurerm'
     command: 'apply'
-    workingDirectory: '$(System.DefaultWorkingDirectory)/Module'
+    workingDirectory: '$(System.DefaultWorkingDirectory)\Module'
     environmentServiceNameAzureRM: 'raj-service'
     args: '-auto-approve'
