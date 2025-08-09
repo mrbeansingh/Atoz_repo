@@ -7,10 +7,38 @@ variables:
   service-connection: 'raj-service'
 
 steps:
-- task: TerraformInstaller@1
+# - task: TerraformInstaller@1
+#   inputs:
+#     terraformVersion: 'latest'
+- task: AzurePowerShell@5
   inputs:
-    terraformVersion: 'latest'
-
+    azureSubscription: 'raj-service'
+    ScriptType: 'InlineScript'
+    Inline: |
+      - powershell: |
+          $tfVersion = "1.12.2"
+          $tfUrl = "https://releases.hashicorp.com/terraform/$tfVersion/terraform_${tfVersion}_windows_amd64.zip"
+          $tfZip = "$env:TEMP\terraform.zip"
+          $tfExtract = "$env:USERPROFILE\terraform\$tfVersion"
+      
+          # Download Terraform zip
+          Invoke-WebRequest -Uri $tfUrl -OutFile $tfZip
+      
+          # Create directory if not exists
+          if (-Not (Test-Path $tfExtract)) {
+              New-Item -ItemType Directory -Path $tfExtract | Out-Null
+          }
+      
+          # Extract zip file (overwrite existing)
+          Expand-Archive -Path $tfZip -DestinationPath $tfExtract -Force
+      
+          # Add extracted folder to PATH for current pipeline step
+          Write-Host "##vso[task.prependpath]$tfExtract"
+      
+          # Verify terraform version
+          terraform --version
+        displayName: 'Manual Terraform Install via PowerShell'
+        shell: pwsh
 
 # Terraform Init
 - task: TerraformTask@5
