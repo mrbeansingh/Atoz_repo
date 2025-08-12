@@ -7,60 +7,17 @@ variables:
   service-connection: 'raj-service'
 
 steps:
-# Manually install Terraform 1.12.2
-- powershell: |
-    $tfVersion = "1.12.2"
-    $tfUrl = "https://releases.hashicorp.com/terraform/$tfVersion/terraform_${tfVersion}_windows_amd64.zip"
-    $tfZip = "$env:TEMP\terraform.zip"
-    $tfExtract = "$env:USERPROFILE\terraform\$tfVersion"
+- task: TerraformInstaller@1
+  displayName: 'Terraform install' 
+  inputs:
+    terraformVersion: 'latest'
 
-    Invoke-WebRequest -Uri $tfUrl -OutFile $tfZip
-    Expand-Archive -Path $tfZip -DestinationPath $tfExtract -Force
-
-    echo "##vso[task.prependpath]$tfExtract"
-    terraform --version
-  displayName: "Manually install Terraform 1.12.2"
-
-# Terraform Init
 - task: TerraformTask@5
-  displayName: 'Terraform Init'
   inputs:
     provider: 'azurerm'
     command: 'init'
-    workingDirectory: $(path)
-    backendServiceArm: '$(service-connection)'
-    backendAzureRmResourceGroupName: 'raj-kumar-snatoshi'
-    backendAzureRmStorageAccountName: 'rajkastorage1123'
-    backendAzureRmContainerName: 'raj-dbba'
-    backendAzureRmKey: 'dabba.tfstate'
-
-# Terraform Plan
-- task: TerraformTask@5
-  displayName: 'Terraform Plan'
-  name: terraformPlan  
-  inputs:
-    provider: 'azurerm'
-    command: 'plan'
-    workingDirectory: $(path)
-    environmentServiceNameAzureRM: $(service-connection)
-
-# Optional manual approval
-# - task: ManualValidation@1
-#   displayName: '🛑 Manual Approval Before Apply'
-#   condition: succeeded('terraformPlan')
-#   timeoutInMinutes: 60
-#   inputs:
-#     instructions: 'Review Terraform plan and approve to continue.'
-#     notifyUsers: 'abhay.kumar.singh11sep@gmail.com'
-#     onTimeout: 'reject'
-
-# Terraform Apply
-- task: TerraformTask@5
-  displayName: 'Terraform Apply'
-  condition: succeeded()
-  inputs:
-    provider: 'azurerm'
-    command: 'apply'
-    workingDirectory: $(path)
-    environmentServiceNameAzureRM: $(service-connection)
-    args: '-auto-approve'
+    backendServiceArm: 'Pipeline-service-connection'
+    backendAzureRmResourceGroupName: 'abhay-rg'
+    backendAzureRmStorageAccountName: 'abhaypipelinestorage1234'
+    backendAzureRmContainerName: 'newcontainer'
+    backendAzureRmKey: 'terraform.tfstate'
